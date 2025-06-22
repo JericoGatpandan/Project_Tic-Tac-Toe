@@ -1,62 +1,8 @@
-let boxes = document.querySelectorAll(".box");
-let turnX = true;
+const boxes = document.querySelectorAll(".box");
+const statusText = document.querySelector(".status-text");
+const restartBtn = document.querySelector(".restart");
 
-const GameBoard = function () {
-  const board = [null, null, null, null, null, null, null, null, null];
-
-  return {
-    getBoard() {
-      return [...board];
-    },
-    setMark(index, mark) {
-      if (board[index] == null) {
-        board[index] = mark;
-        return index;
-      }
-    },
-
-    resetBoard() {
-      board.fill(null);
-    },
-  };
-};
-boxes.forEach((box) => {
-  box.addEventListener("click", () => {
-    const index = parseInt(box.dataset.index);
-
-    if (turnX) {
-      box.innerText = "X";
-      turnX = false;
-      box.disabled = true;
-      board.setMark(index, "X");
-    } else {
-      box.innerText = "O";
-      turnX = true;
-      board.setMark(index, "O");
-      box.disabled = true;
-    }
-  });
-});
-
-const Player = (name, mark) => {
-  let score = 0;
-  return {
-    getName() {
-      return name;
-    },
-    getMark() {
-      return mark;
-    },
-    getScore() {
-      return score;
-    },
-    addScore() {
-      score++;
-    },
-  };
-};
-
-const winning_combo = [
+const winConditions = [
   [0, 1, 2],
   [0, 3, 6],
   [0, 4, 8],
@@ -67,27 +13,70 @@ const winning_combo = [
   [6, 7, 8],
 ];
 
-let board = GameBoard();
+let options = ["", "", "", "", "", "", "", "", ""];
+let currentPlayer = "X";
+let running = false;
 
-let player1 = Player("Player 1", "X");
-let player2 = Player("Player 2", "O");
-
-let boardArray = board.getBoard();
-
-console.log(boardArray);
-
-function checkWin(boardArray) {
-  for (let combo of winning_combo) {
-    const [a, b, c] = combo;
-    if (
-      boardArray[a] !== null &&
-      boardArray[a] === boardArray[b] &&
-      boardArray[b] === boardArray[c]
-    ) {
-      return boardArray[a];
-    }
-  }
-  return null;
+initializedGame();
+function initializedGame() {
+  boxes.forEach((box) => box.addEventListener("click", cellClicked));
+  restartBtn.addEventListener("click", restartGame);
+  statusText.textContent = `${currentPlayer}'s turn`;
+  running = true;
 }
 
-const result = checkWin(board.getBoard());
+function cellClicked() {
+  const boxIndex = this.dataset.index;
+  if (options[boxIndex] != "" || !running) {
+    return;
+  }
+
+  updateCell(this, boxIndex);
+  checkWinner();
+}
+
+function updateCell(box, index) {
+  options[index] = currentPlayer;
+  box.textContent = currentPlayer;
+}
+
+function changePlayer() {
+  currentPlayer = currentPlayer == "X" ? "O" : "X";
+  statusText.textContent = `${currentPlayer}'s turn`;
+}
+
+function checkWinner() {
+  let roundWon = false;
+
+  for (let i = 0; i < winConditions.length; i++) {
+    const condition = winConditions[i];
+    const cellA = options[condition[0]];
+    const cellB = options[condition[1]];
+    const cellC = options[condition[2]];
+
+    if (cellA == "" || cellB == "" || cellC == "") {
+      continue;
+    }
+    if (cellA == cellB && cellB == cellC) {
+      roundWon = true;
+      break;
+    }
+  }
+
+  if (roundWon) {
+    statusText.textContent = `${currentPlayer} wins`;
+    running = false;
+  } else if (!options.includes("")) {
+    statusText.textContent = "Draw!";
+  } else {
+    changePlayer();
+  }
+}
+
+function restartGame() {
+  currentPlayer = "X";
+  options = ["", "", "", "", "", "", "", "", ""];
+  statusText.textContent = `${currentPlayer}'s turn`;
+  boxes.forEach((box) => (box.textContent = ""));
+  running = true;
+}
