@@ -58,12 +58,17 @@ let board = Gameboard();
 let currentPlayer = player1;
 let running = false;
 
+
+
 initializedGame();
+
 
 function initializedGame() {
   boxes.forEach((box) => box.addEventListener("click", boxClicked));
   restartBtn.addEventListener("click", restartGame);
   statusText.textContent = `${currentPlayer.getName()}'s turn`;
+  statusText.setAttribute('data-value', currentPlayer.getName());
+
   running = true;
 }
 
@@ -78,10 +83,13 @@ function boxClicked() {
 function updateBox(box, index) {
   board.setMark(index, currentPlayer.getMark());
   box.textContent = currentPlayer.getMark();
+
+  box.setAttribute('data-value', currentPlayer.getMark());
 }
 function changePlayer() {
   currentPlayer = currentPlayer == player1 ? player2 : player1;
   statusText.textContent = `${currentPlayer.getName()}'s turn`;
+  statusText.setAttribute('data-value', currentPlayer.getName());
 }
 function checkWinner() {
   let roundWon = false;
@@ -111,11 +119,16 @@ function checkWinner() {
   } else {
     changePlayer();
   }
+  statusText.setAttribute('data-value', currentPlayer.getName());
 }
 function restartGame() {
   board.resetBoard();
-  boxes.forEach((box) => (box.textContent = ""));
+  boxes.forEach((box) => {
+    box.textContent = "";
+    box.removeAttribute('data-value');
+  });
   currentPlayer = player1;
   statusText.textContent = `${currentPlayer.getName()}'s turn`;
   running = true;
+  statusText.setAttribute('data-value', currentPlayer.getName());
 }
