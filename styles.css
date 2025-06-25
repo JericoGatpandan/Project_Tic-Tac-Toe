@@ -77,3 +77,28 @@ h1 {
 .restart:hover {
   background-color: #359f9d;
 }
+
+.footer {
+  width: 100%;
+  text-align: center;
+  padding: 20px 0 10px 0;
+  background: rgba(17, 41, 57, 0.7);
+  font-size: 1rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  color: #b0b8c1;
+  letter-spacing: 0.5px;
+}
+
+.footer a {
+  color: #ffcf6b;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.footer a:hover {
+  color: #e36849;
+  text-decoration: underline;
+}
